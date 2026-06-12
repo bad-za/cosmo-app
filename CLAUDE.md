@@ -37,7 +37,31 @@ npm test               # все тесты (vitest, packages/*/tests/)
 npm run dev:pulsar     # пульсар-часы → http://localhost:5183
 npm run dev:simulator  # симулятор   → http://localhost:5184
 npm run build          # сборка всех workspace
+npm run lab -- ...     # headless-прогон сценария (см. ниже)
 ```
+
+## Агент-лаборант: эксперименты и отчёты
+
+`npm run lab` гоняет сценарий без рендера и выгружает метрики орбит
+(большие полуоси, эксцентриситеты, вылетевшие тела, дрейф энергии).
+
+```
+npm run lab -- --scenario star-flyby --years 50                  # JSON в stdout
+npm run lab -- --scenario base --years 500 --mass "Юпитер=10" \
+  --out reports/data/run.json --csv reports/data/run.csv         # файлы
+```
+
+Флаги: `--scenario <id>` (base, no-jupiter, second-moon, star-flyby, earth-x2),
+`--years`, `--dt` (по умолчанию 1e-3), `--sample` (интервал временного ряда),
+`--mass "Имя=K"` и `--remove "Имя"` (повторяемые), `--out`, `--csv`.
+
+Как писать отчёт по серии экспериментов:
+1. Спланировать серию (какой параметр сканируем, какие критерии «поломки»).
+2. Прогнать серию `npm run lab`, сырые JSON класть в `reports/data/`.
+3. Отчёт — markdown в `reports/`: метод, команды воспроизведения, таблица
+   результатов, выводы. Все цифры — только из реальных прогонов; контроль
+   честности — дрейф энергии в каждом прогоне (должен быть ≪ 1e-4).
+4. Пример: `reports/jupiter-mass-vs-mars.md`.
 
 ## Принципы
 
