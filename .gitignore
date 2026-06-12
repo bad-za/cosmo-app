@@ -5,3 +5,4 @@ dist/
 
 # секреты — никогда не коммитить
 secrets.md
+secrets-notes.txt

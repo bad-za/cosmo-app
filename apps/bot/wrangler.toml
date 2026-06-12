@@ -1,0 +1,4 @@
+# Бэкенд бота: деплой — `npx wrangler deploy` из этой папки (нужен Node 22+)
+name = "pocket-cosmos-bot"
+main = "worker.js"
+compatibility_date = "2025-01-01"
