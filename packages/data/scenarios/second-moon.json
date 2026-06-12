@@ -1,0 +1,19 @@
+{
+  "id": "second-moon",
+  "name": "Вторая Луна",
+  "description": "У Земли появляется вторая луна на встречной стороне. Долго ли проживёт такая пара?",
+  "modifications": [
+    {
+      "op": "addRelative",
+      "relativeTo": "Земля",
+      "body": {
+        "name": "Луна-2",
+        "mass": 3.69e-8,
+        "offset": [0.0035, 0, 0],
+        "velocityOffset": [0, 0.184, 0.01],
+        "radiusKm": 1700,
+        "color": "#d8c8e8"
+      }
+    }
+  ]
+}

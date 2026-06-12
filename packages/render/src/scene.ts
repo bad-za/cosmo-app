@@ -58,6 +58,21 @@ export class SpaceScene {
     this.frameCallbacks.push(cb);
   }
 
+  /** Точка клика, спроецированная на плоскость эклиптики (z = 0), или null */
+  pointOnEcliptic(event: PointerEvent): [number, number, number] | null {
+    const canvas = this.renderer.domElement;
+    const rect = canvas.getBoundingClientRect();
+    const ndc = new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(ndc, this.camera);
+    const hit = new THREE.Vector3();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    return raycaster.ray.intersectPlane(plane, hit) ? [hit.x, hit.y, hit.z] : null;
+  }
+
   dispose(): void {
     this.running = false;
     this.renderer.dispose();

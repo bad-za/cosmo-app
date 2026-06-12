@@ -178,6 +178,85 @@ input[type='range'] {
   color: var(--alarm);
 }
 
+/* ---------- Сценарии, добавление тел, журнал ---------- */
+
+.select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: #11141f;
+  color: var(--fg);
+  font-size: 0.85rem;
+}
+
+.scenario-desc {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.btn.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.btn.danger {
+  margin-top: 0.7rem;
+  width: 100%;
+  color: var(--alarm);
+}
+
+.btn.danger:hover {
+  border-color: var(--alarm);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.add-hint {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--accent-dim);
+  border-radius: 999px;
+  background: rgba(10, 14, 26, 0.85);
+  color: var(--accent);
+  font-size: 0.82rem;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.mass-label {
+  margin-top: 0.7rem;
+}
+
+.journal-wrap h3 {
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.journal {
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.journal .alarm {
+  color: var(--alarm);
+}
+
 .source {
   margin-top: auto;
   color: var(--muted);
