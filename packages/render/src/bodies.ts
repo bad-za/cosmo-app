@@ -42,6 +42,11 @@ class Trail {
     if (this.last) {
       const d = Math.hypot(p[0] - this.last[0], p[1] - this.last[1], p[2] - this.last[2]);
       if (d < TRAIL_MIN_STEP) return;
+      // Слишком большой скачок за кадр (высокая скорость времени): соединять
+      // точки хордой бессмысленно — обрываем след и начинаем заново,
+      // иначе орбиты зарастают «паутиной» линий через всю систему.
+      const maxSegment = Math.min(5, Math.max(0.08, 0.25 * Math.hypot(...p)));
+      if (d > maxSegment) this.clear();
     }
     this.last = [...p];
     this.positions.set(p, this.head * 3);
