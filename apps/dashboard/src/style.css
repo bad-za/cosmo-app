@@ -1,0 +1,98 @@
+/* Дашборд: общая оболочка двух сцен + оверлей часов */
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #05060c;
+  color: #e8eaf2;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.panel-host {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.panel-host .panel {
+  flex: 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Индикатор режима ---------- */
+
+.mode-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgba(127, 212, 255, 0.25);
+  border-radius: 999px;
+  background: rgba(10, 14, 26, 0.8);
+  color: #7fd4ff;
+  font-size: 0.78rem;
+}
+
+/* ---------- Панель галактики ---------- */
+
+.galaxy-hint {
+  color: #828aa6;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.galaxy-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+/* кнопки .pulsar-btn приходят со стилями из @space/clock */
+
+/* ---------- Оверлей часов ---------- */
+
+.clock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: radial-gradient(120% 100% at 70% 20%, #0a0d1c 0%, #05060c 60%);
+  display: grid;
+}
+
+.clock-host {
+  height: 100%;
+}
+
+.clock-close {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 25;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(130, 140, 180, 0.3);
+  border-radius: 999px;
+  background: rgba(10, 14, 26, 0.8);
+  color: #e8eaf2;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.clock-close:hover {
+  border-color: #7fd4ff;
+}

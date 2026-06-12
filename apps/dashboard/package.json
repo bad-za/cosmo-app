@@ -1,19 +1,22 @@
 {
-  "name": "simulator",
+  "name": "dashboard",
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": {
-    "./app": "./src/sim-app.ts"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@space/clock": "*",
     "@space/core": "*",
     "@space/data": "*",
-    "@space/render": "*"
+    "@space/render": "*",
+    "simulator": "*",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.170.0"
   }
 }

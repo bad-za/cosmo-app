@@ -16,11 +16,15 @@ packages/
     src/units.ts # система единиц
     tests/
   render/    # общие Three.js-компоненты (сцена, камера, тела, следы орбит)
+  clock/     # переиспользуемый UI-компонент пульсар-часов (DOM + Web Audio)
   data/      # скрипты загрузки данных + закэшированные JSON
 apps/
-  pulsar-clock/  # приложение 1 (порт 5183)
-  simulator/     # приложение 2 (порт 5184)
-  dashboard/     # склейка, создаётся на этапе М
+  pulsar-clock/  # часы на весь экран (порт 5183) — оболочка над @space/clock
+  simulator/     # симулятор (порт 5184); экспортирует "simulator/app" для дашборда
+  dashboard/     # обе сцены: система + галактика (порт 5185)
+scripts/
+  lab.ts     # headless-прогоны сценариев (npm run lab)
+reports/     # отчёты агента-лаборанта + сырые данные прогонов
 ```
 
 ## Система единиц (packages/core/src/units.ts)
@@ -36,6 +40,7 @@ npm install            # из корня, один раз
 npm test               # все тесты (vitest, packages/*/tests/)
 npm run dev:pulsar     # пульсар-часы → http://localhost:5183
 npm run dev:simulator  # симулятор   → http://localhost:5184
+npm run dev:dashboard  # дашборд     → http://localhost:5185
 npm run build          # сборка всех workspace
 npm run lab -- ...     # headless-прогон сценария (см. ниже)
 ```

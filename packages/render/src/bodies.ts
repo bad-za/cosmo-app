@@ -72,13 +72,14 @@ class Trail {
 }
 
 export class BodiesView {
-  private readonly group = new THREE.Group();
+  /** Корневая группа: всё отображение тел внутри — можно скрывать/масштабировать целиком */
+  readonly root = new THREE.Group();
   private readonly meshes = new Map<string, THREE.Mesh>();
   private readonly trails = new Map<string, Trail>();
   private readonly raycaster = new THREE.Raycaster();
 
-  constructor(private readonly scene: THREE.Scene) {
-    scene.add(this.group);
+  constructor(scene: THREE.Scene) {
+    scene.add(this.root);
   }
 
   /** Привести отображение в соответствие списку тел (создать/удалить/подвинуть) */
@@ -86,9 +87,9 @@ export class BodiesView {
     const alive = new Set(bodies.map((b) => b.name));
     for (const [name, mesh] of this.meshes) {
       if (!alive.has(name)) {
-        this.group.remove(mesh);
+        this.root.remove(mesh);
         const trail = this.trails.get(name)!;
-        this.scene.remove(trail.line);
+        this.root.remove(trail.line);
         this.meshes.delete(name);
         this.trails.delete(name);
       }
@@ -103,9 +104,9 @@ export class BodiesView {
           : new THREE.MeshStandardMaterial({ color: b.color, roughness: 0.85 });
         mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), mat);
         mesh.name = b.name;
-        this.group.add(mesh);
+        this.root.add(mesh);
         const trail = new Trail(b.color);
-        this.scene.add(trail.line);
+        this.root.add(trail.line);
         this.meshes.set(b.name, mesh);
         this.trails.set(b.name, trail);
       }
