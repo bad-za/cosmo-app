@@ -1,9 +1,14 @@
-/* Тёмная «космическая» тема — общая основа, развивается на этапе P2 */
+/* Пульсар-часы — тёмная «космическая» тема */
+
 :root {
   color-scheme: dark;
-  --bg: #06070d;
+  --bg: #05060c;
+  --panel: rgba(16, 19, 33, 0.75);
   --fg: #e8eaf2;
-  --muted: #8a90a8;
+  --muted: #828aa6;
+  --accent: #7fd4ff;
+  --accent-dim: rgba(127, 212, 255, 0.25);
+  --border: rgba(130, 140, 180, 0.18);
 }
 
 * {
@@ -11,25 +16,242 @@
   box-sizing: border-box;
 }
 
+html,
 body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: system-ui, -apple-system, sans-serif;
+  height: 100%;
 }
 
-main {
-  text-align: center;
+body {
+  background: radial-gradient(120% 100% at 70% 20%, #0a0d1c 0%, var(--bg) 60%);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+#stars {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.clock {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  height: 100vh;
+}
+
+/* ---------- Сцена с пульсаром ---------- */
+
+.stage {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3rem;
+}
+
+.orb-wrap {
+  --pulse: 0;
+  position: relative;
+  width: min(34vmin, 260px);
+  aspect-ratio: 1;
+}
+
+.orb {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #ffffff, var(--accent) 45%, #1d4e75 100%);
+  opacity: calc(0.25 + 0.75 * var(--pulse));
+  box-shadow:
+    0 0 calc(20px + 90px * var(--pulse)) calc(2px + 18px * var(--pulse)) var(--accent-dim),
+    0 0 calc(60px + 160px * var(--pulse)) calc(10px + 40px * var(--pulse)) rgba(127, 212, 255, 0.12);
+  transition: none;
+}
+
+.orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--accent-dim);
+  opacity: calc(0.2 + 0.5 * var(--pulse));
+  transform: scale(calc(0.92 + 0.1 * var(--pulse)));
+}
+
+.freq-label {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+#freq-value {
+  font-size: 2rem;
+  font-weight: 200;
+  letter-spacing: 0.12em;
+}
+
+.strobe-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-height: 1.1em;
+}
+
+/* ---------- Панель ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.4rem;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  overflow-y: auto;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 h1 {
+  font-size: 1.15rem;
   font-weight: 300;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-p {
-  margin-top: 0.75rem;
+.mute {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mute:hover {
+  border-color: var(--accent);
+}
+
+/* ---------- Переключатель ---------- */
+
+.switcher {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.pulsar-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--fg);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.pulsar-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pulsar-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.pulsar-btn-period {
   color: var(--muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Карточка ---------- */
+
+.card h2 {
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+.psr-name {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 300;
+  margin-left: 0.4rem;
+}
+
+.story {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.card dl {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 0.35rem;
+}
+
+.card dt {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.card dd {
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel {
+  margin-top: 0.9rem;
+  font-size: 0.88rem;
+  color: var(--accent);
+  line-height: 1.45;
+}
+
+.source {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+
+  .clock {
+    grid-template-columns: 1fr;
+    grid-template-rows: 55vh auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .panel {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
 }
