@@ -23,6 +23,7 @@ apps/
   simulator/     # симулятор (порт 5184); экспортирует "simulator/app" для дашборда
   dashboard/     # обе сцены: система + галактика (порт 5185); экспортирует "dashboard/app"
   telegram/      # Telegram Mini App поверх дашборда (порт 5186, см. docs/telegram-miniapp.md)
+  bot/           # бэкенд бота @pocket_cosmos_bot: Cloudflare Worker (webhook Telegram)
 scripts/
   lab.ts     # headless-прогоны сценариев (npm run lab)
 reports/     # отчёты агента-лаборанта + сырые данные прогонов
@@ -46,6 +47,17 @@ npm run dev:telegram   # мини-апп    → http://localhost:5186
 npm run build          # сборка всех workspace
 npm run lab -- ...     # headless-прогон сценария (см. ниже)
 ```
+
+## Прод и секреты
+
+Мини-апп опубликован: бот @pocket_cosmos_bot, прод на GitHub Pages
+(https://bad-za.github.io/cosmo-app/), зеркало и бэкенд бота — на Cloudflare
+Workers. Все адреса, команды деплоя и работа с секретами —
+в `docs/telegram-miniapp.md`.
+
+ВАЖНО: `secrets.md` и `secrets-notes.txt` содержат токены — они в .gitignore,
+никогда не коммитить и не выводить содержимое в логи. Репозиторий публичный.
+Для wrangler нужен Node 22: `export PATH="$HOME/.local/node22/bin:$PATH"`.
 
 ## Агент-лаборант: эксперименты и отчёты
 

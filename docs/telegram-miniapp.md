@@ -1,58 +1,97 @@
-# Публикация Telegram Mini App
+# Telegram Mini App: текущее состояние и эксплуатация
 
-Мини-апп — это приложение `apps/telegram`: дашборд (система + галактика + часы)
-с интеграцией Telegram SDK и мобильной раскладкой. Бэкенда нет, нужен только
-статический HTTPS-хостинг.
+## Что где живёт
 
-## 1. Сборка
+| Что | Где | Примечание |
+|---|---|---|
+| Бот | [@pocket_cosmos_bot](https://t.me/pocket_cosmos_bot) «Карманный космос» | имя/описания заданы через Bot API |
+| Мини-апп (прод) | https://bad-za.github.io/cosmo-app/ | GitHub Pages, ветка `gh-pages` |
+| Зеркало | https://pocket-cosmos.bigbadnoob.workers.dev | Cloudflare Worker со статикой |
+| Бэкенд бота | https://pocket-cosmos-bot.bigbadnoob.workers.dev | Cloudflare Worker, `apps/bot/` |
+| Репозиторий | https://github.com/bad-za/cosmo-app | публичный (нужно для бесплатного GH Pages) |
 
-```
+Кнопка меню бота («🌌 Космос»), ответы бота и описания указывают на GitHub Pages.
+
+## Секреты (НЕ коммитить — оба файла в .gitignore)
+
+- `secrets.md` — токен бота (формат RTF, токен достаётся grep-ом).
+- `secrets-notes.txt` — секрет вебхука Telegram.
+- В Cloudflare у воркера `pocket-cosmos-bot` заданы секреты `BOT_TOKEN`
+  и `WEBHOOK_SECRET` (`wrangler secret put`).
+
+При перевыпуске токена (`/revoke` в BotFather): обновить `secrets.md`,
+затем `wrangler secret put BOT_TOKEN` и заново `setWebhook` (см. ниже).
+
+## Инструменты деплоя
+
+- GitHub: `gh` CLI (аккаунт bad-za).
+- Cloudflare: wrangler 4 требует Node 22 — он стоит локально в `~/.local/node22`,
+  системный Node 18 не трогаем. Перед командами wrangler:
+  `export PATH="$HOME/.local/node22/bin:$PATH"`. Аккаунт Cloudflare —
+  bigbadnoob@gmail.com (OAuth-логин wrangler уже выполнен).
+
+## Обновить мини-апп (прод, GitHub Pages)
+
+```bash
 npm run build -w apps/telegram
+cd apps/telegram/dist && git init -b gh-pages && git add -A \
+  && git commit -m deploy && git push -f https://github.com/bad-za/cosmo-app.git gh-pages \
+  && cd ../../.. && rm -rf apps/telegram/dist/.git
 ```
 
-Результат — статика в `apps/telegram/dist/` (пути относительные, можно класть
-в подкаталог любого домена).
+Страница обновляется через ~1 минуту после пуша.
 
-## 2. Хостинг (любой статический, по HTTPS)
+## Обновить зеркало на Cloudflare
 
-Самый простой бесплатный вариант — Cloudflare Pages:
+```bash
+export PATH="$HOME/.local/node22/bin:$PATH"
+cd apps/telegram && npx wrangler@4 deploy --assets ./dist \
+  --name pocket-cosmos --compatibility-date 2025-01-01
+```
 
-1. Залить репозиторий на GitHub/GitLab.
-2. В Cloudflare Pages: Create project → подключить репозиторий.
-3. Build command: `npm install && npm run build -w apps/telegram`
-   Output directory: `apps/telegram/dist`
-4. Получите URL вида `https://<имя>.pages.dev`.
+## Бэкенд бота (`apps/bot/`)
 
-Альтернативы: Vercel, Netlify, GitHub Pages (туда можно просто залить
-содержимое `dist/` в ветку `gh-pages`).
+Worker отвечает на `/start` и любые сообщения кнопкой мини-аппа;
+запросы без секретного заголовка Telegram отклоняет (403).
 
-Для быстрой проверки с телефона без деплоя: `npm run dev:telegram` +
-туннель с HTTPS, например `npx localtunnel --port 5186` или cloudflared.
+Деплой после правок `worker.js`:
 
-## 3. Бот и привязка мини-аппа
+```bash
+export PATH="$HOME/.local/node22/bin:$PATH"
+cd apps/bot && npx wrangler@4 deploy
+```
 
-В чате с [@BotFather](https://t.me/BotFather):
+Перепривязать webhook (нужно после смены токена или URL воркера):
 
-1. `/newbot` → имя и username бота (если бота ещё нет).
-2. `/newapp` → выбрать бота → название, описание, иконка 640×360 →
-   **Web App URL** = адрес хостинга из шага 2 → короткое имя аппа.
-   Мини-апп станет доступен по ссылке `https://t.me/<бот>/<короткое_имя>`.
-3. Дополнительно можно повесить мини-апп на кнопку меню бота:
-   `/mybots` → бот → Bot Settings → Menu Button → указать тот же URL.
+```bash
+TOKEN=$(grep -oE '[0-9]{8,12}:[A-Za-z0-9_-]{30,}' secrets.md)
+SECRET=$(grep -oE '[0-9a-f]{32}' secrets-notes.txt)
+curl -s "https://api.telegram.org/bot$TOKEN/setWebhook" \
+  -d "url=https://pocket-cosmos-bot.bigbadnoob.workers.dev" \
+  -d "secret_token=$SECRET" -d "drop_pending_updates=true" \
+  -d 'allowed_updates=["message"]'
+```
 
-## 4. Что уже учтено в приложении
+Диагностика: `curl -s "https://api.telegram.org/bot$TOKEN/getWebhookInfo"` —
+поле `last_error_message` должно отсутствовать.
 
-- `tg.ready()` + `tg.expand()` — мини-апп сразу открывается на всю высоту.
-- `disableVerticalSwipes()` — свайп камеры не сворачивает приложение.
-- Высота берётся из `--tg-viewport-stable-height` (без прыжков при
-  показе/скрытии клавиатуры и шапки).
-- Панель управления — выдвижная шторка снизу (кнопка «☰ панель»).
-- Потолок шагов физики на кадр адаптивный: на слабых телефонах симуляция
-  замедляется, но FPS не проседает.
-- Звук пульсаров включается только по нажатию кнопки — это требование
-  мобильных WebView, оно уже соблюдено.
+## Что настроено через Bot API (повторять не нужно)
 
-## 5. Обновление
+- `setChatMenuButton`: кнопка «🌌 Космос» → мини-апп.
+- `setMyName` / `setMyShortDescription` / `setMyDescription` (ru + default).
 
-Любой пуш в репозиторий (при подключённом CI хостинга) пересобирает мини-апп.
-URL в BotFather менять не нужно.
+## Что делается только руками в BotFather
+
+- Аватар: `/setuserpic` → файл `docs/assets/bot-avatar-512.png`.
+- Мини-апп с прямой ссылкой `t.me/pocket_cosmos_bot/<имя>`: `/newapp`,
+  обложка `docs/assets/miniapp-cover-640x360.png` (есть вариант без текста).
+- Перевыпуск токена: `/revoke`.
+
+## Что уже учтено в приложении (apps/telegram)
+
+- `tg.ready()` + `tg.expand()`, `disableVerticalSwipes()` — свайпы камеры
+  не сворачивают мини-апп.
+- Высота из `--tg-viewport-stable-height` (без прыжков при показе шапки).
+- Панель — выдвижная шторка снизу («☰ панель»), крупные контролы.
+- Потолок шагов физики на кадр адаптивный (250–4000 по фактическому FPS).
+- Звук включается по жесту — требование мобильных WebView соблюдено.
