@@ -1,0 +1,35 @@
+/* Тёмная «космическая» тема — общая основа, развивается на этапе P2 */
+:root {
+  color-scheme: dark;
+  --bg: #06070d;
+  --fg: #e8eaf2;
+  --muted: #8a90a8;
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+main {
+  text-align: center;
+}
+
+h1 {
+  font-weight: 300;
+  letter-spacing: 0.08em;
+}
+
+p {
+  margin-top: 0.75rem;
+  color: var(--muted);
+}

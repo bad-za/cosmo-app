@@ -1,0 +1,14 @@
+{
+  "name": "pulsar-clock",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@space/core": "*"
+  }
+}
