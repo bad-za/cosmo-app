@@ -94,4 +94,26 @@ curl -s "https://api.telegram.org/bot$TOKEN/setWebhook" \
 - Высота из `--tg-viewport-stable-height` (без прыжков при показе шапки).
 - Панель — выдвижная шторка снизу («☰ панель»), крупные контролы.
 - Потолок шагов физики на кадр адаптивный (250–4000 по фактическому FPS).
-- Звук включается по жесту — требование мобильных WebView соблюдено.
+- Звук включается по жесту — требование мобильных WebView соблюдено;
+  AudioContext закрывается при закрытии часов (их число в WebView ограничено,
+  без `close()` звук переставал включаться после нескольких открытий).
+- Скролл панелей не «утекает» в жесты Telegram и на canvas сцены:
+  `overscroll-behavior: contain` + `touch-action: pan-y` на всех
+  прокручиваемых блоках; часы на телефоне — фиксированная высота,
+  панель скроллится внутри себя.
+
+## Визуальная проверка без телефона
+
+Headless Chrome умеет рендерить сцену (WebGL через SwiftShader) — удобно
+проверять вёрстку и рендер до деплоя:
+
+```bash
+npm run dev:dashboard   # или dev:telegram
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless=new --use-angle=swiftshader --hide-scrollbars \
+  --window-size=390,844 --virtual-time-budget=12000 \
+  --screenshot=/tmp/shot.png http://localhost:5185/
+```
+
+`--window-size=390,844` — телефонная раскладка, `1280,800` — десктопная.
+Старый `--headless` (без `=new`) WebGL не рендерит — будет пустой фон.
