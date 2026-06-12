@@ -21,7 +21,8 @@ packages/
 apps/
   pulsar-clock/  # часы на весь экран (порт 5183) — оболочка над @space/clock
   simulator/     # симулятор (порт 5184); экспортирует "simulator/app" для дашборда
-  dashboard/     # обе сцены: система + галактика (порт 5185)
+  dashboard/     # обе сцены: система + галактика (порт 5185); экспортирует "dashboard/app"
+  telegram/      # Telegram Mini App поверх дашборда (порт 5186, см. docs/telegram-miniapp.md)
 scripts/
   lab.ts     # headless-прогоны сценариев (npm run lab)
 reports/     # отчёты агента-лаборанта + сырые данные прогонов
@@ -41,6 +42,7 @@ npm test               # все тесты (vitest, packages/*/tests/)
 npm run dev:pulsar     # пульсар-часы → http://localhost:5183
 npm run dev:simulator  # симулятор   → http://localhost:5184
 npm run dev:dashboard  # дашборд     → http://localhost:5185
+npm run dev:telegram   # мини-апп    → http://localhost:5186
 npm run build          # сборка всех workspace
 npm run lab -- ...     # headless-прогон сценария (см. ниже)
 ```

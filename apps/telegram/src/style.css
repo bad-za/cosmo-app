@@ -1,0 +1,75 @@
+/* Мини-апп: мобильная раскладка поверх стилей дашборда.
+   Высота — из переменных Telegram (--tg-viewport-stable-height), иначе 100vh. */
+
+.layout {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr auto;
+  height: var(--tg-viewport-stable-height, 100vh) !important;
+}
+
+/* Панель — шторка снизу */
+.panel-host {
+  max-height: 46vh;
+  overflow-y: auto;
+  border-top: 1px solid rgba(130, 140, 180, 0.18);
+  transition: max-height 0.25s ease;
+}
+
+.layout.sheet-collapsed .panel-host {
+  max-height: 0;
+  border-top: none;
+}
+
+.panel {
+  border-left: none !important;
+}
+
+/* Ручка шторки */
+.sheet-handle {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 6;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(127, 212, 255, 0.3);
+  border-radius: 999px;
+  background: rgba(10, 14, 26, 0.85);
+  color: #7fd4ff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Крупнее элементы управления под палец */
+.btn,
+.select {
+  min-height: 2.6rem;
+}
+
+input[type='range'] {
+  height: 2rem;
+}
+
+/* Бейдж режима не должен спорить с кнопкой Telegram «назад» */
+.mode-badge {
+  top: 0.6rem;
+  left: 0.6rem;
+  font-size: 0.72rem;
+  max-width: 70vw;
+}
+
+/* Часы-оверлей: на телефоне колонкой, панель снизу */
+.clock-root {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 48% 52%;
+}
+
+.clock-root .clock-panel {
+  border-left: none;
+  border-top: 1px solid rgba(130, 140, 180, 0.18);
+}
+
+.clock-close {
+  top: 0.6rem;
+  right: 0.6rem;
+  left: auto;
+}

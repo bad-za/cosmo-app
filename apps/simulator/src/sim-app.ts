@@ -22,8 +22,9 @@ import { formatMass, formatSimTime, formatTimeScale } from './format';
 
 // Базовый шаг интегрирования (годы): ~1.75 часа, Луна устойчива.
 const DT_BASE = 2e-4;
-// Максимум шагов на кадр — потолок вычислений
-const MAX_STEPS_PER_FRAME = 4000;
+// Потолок шагов физики на кадр: подстраивается под производительность устройства
+const MAX_STEPS_LIMIT = 4000;
+const MIN_STEPS_LIMIT = 250;
 // Предельный шаг при больших ускорениях времени (точность падает — честно показываем дрейф)
 const DT_MAX = 4e-3;
 // Перевод длины «прицельного» клика в скорость: 1 а.е. расстояния = 1 а.е./год
@@ -336,17 +337,24 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
   const energyEl = $('.energy');
   const driftEl = $('.energy-drift');
   let uiAccumulator = 0;
+  // Адаптация под устройство: кадры дольше ~45 мс — снижаем потолок шагов,
+  // стабильно быстрые — поднимаем обратно (важно для телефонов в мини-аппе)
+  let stepsLimit = MAX_STEPS_LIMIT;
 
   space.onFrame((dtSec) => {
     if (!active) return;
+    if (dtSec > 0.045) stepsLimit = Math.max(MIN_STEPS_LIMIT, Math.round(stepsLimit * 0.7));
+    else if (dtSec < 0.022 && stepsLimit < MAX_STEPS_LIMIT) {
+      stepsLimit = Math.min(MAX_STEPS_LIMIT, Math.round(stepsLimit * 1.1));
+    }
     if (!paused) {
       const wantYears = timeScale * dtSec;
       let dtStep = DT_BASE;
       let steps = Math.ceil(wantYears / dtStep);
-      if (steps > MAX_STEPS_PER_FRAME) {
+      if (steps > stepsLimit) {
         // Не успеваем базовым шагом — укрупняем шаг до предела, дальше честно не успеваем
-        dtStep = Math.min(wantYears / MAX_STEPS_PER_FRAME, DT_MAX);
-        steps = MAX_STEPS_PER_FRAME;
+        dtStep = Math.min(wantYears / stepsLimit, DT_MAX);
+        steps = stepsLimit;
       }
       sim.steps(steps, dtStep);
       achievedScale = (steps * dtStep) / dtSec;
