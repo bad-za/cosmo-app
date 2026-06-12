@@ -13,6 +13,10 @@
   overflow-y: auto;
   border-top: 1px solid rgba(130, 140, 180, 0.18);
   transition: max-height 0.25s ease;
+  /* Скролл панели не должен утекать в жесты Telegram или на canvas сцены */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .layout.sheet-collapsed .panel-host {

@@ -29,8 +29,15 @@ export class PulsarAudio {
     this._muted = muted;
     if (!muted && !this.ctx) this.initContext();
     if (this.ctx && this.master) {
-      void this.ctx.resume();
       this.master.gain.setTargetAtTime(muted ? 0 : 0.5, this.ctx.currentTime, 0.03);
+      if (!muted && this.ctx.state !== 'running') {
+        // Пока контекст suspended, ctx.currentTime стоит на месте — планировать
+        // тики бесполезно. Запускаем звук только после фактического resume.
+        this.ctx.resume().then(() => {
+          if (!this._muted) this.restart();
+        }).catch(() => {});
+        return;
+      }
     }
     this.restart();
   }
@@ -41,7 +48,13 @@ export class PulsarAudio {
   }
 
   private initContext(): void {
-    this.ctx = new AudioContext();
+    try {
+      this.ctx = new AudioContext();
+    } catch {
+      // Браузер ограничивает число одновременных AudioContext
+      this.ctx = null;
+      return;
+    }
     this.master = this.ctx.createGain();
     this.master.gain.value = 0;
     this.master.connect(this.ctx.destination);
@@ -106,6 +119,19 @@ export class PulsarAudio {
     src.start(Math.max(time, ctx.currentTime));
   }
 
+  /** Полное освобождение: закрыть AudioContext — их число в браузере ограничено,
+   *  без close() звук перестаёт включаться после нескольких открытий часов. */
+  dispose(): void {
+    this._muted = true;
+    this.stopAll();
+    if (this.ctx) {
+      this.ctx.close().catch(() => {});
+      this.ctx = null;
+      this.master = null;
+      this.noiseBuffer = null;
+    }
+  }
+
   private stopAll(): void {
     if (this.schedulerId !== null) {
       clearInterval(this.schedulerId);
@@ -114,7 +140,14 @@ export class PulsarAudio {
     if (this.osc && this.oscGain && this.ctx) {
       const osc = this.osc;
       this.oscGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
-      setTimeout(() => osc.stop(), 300);
+      // try: к этому моменту контекст может быть уже закрыт через dispose()
+      setTimeout(() => {
+        try {
+          osc.stop();
+        } catch {
+          /* контекст закрыт */
+        }
+      }, 300);
       this.osc = null;
       this.oscGain = null;
     }

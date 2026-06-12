@@ -36,6 +36,9 @@
   background: var(--panel);
   border-left: 1px solid var(--border);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 h1 {
@@ -231,6 +234,8 @@ input[type='range'] {
   gap: 0.3rem;
   max-height: 180px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   font-size: 0.76rem;
   color: var(--muted);
 }

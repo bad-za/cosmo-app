@@ -9,7 +9,10 @@ export function formatInt(n: number): string {
 /** Скорость течения времени, лет/с → человеческий вид */
 export function formatTimeScale(yearsPerSec: number): string {
   const daysPerSec = yearsPerSec * 365.25;
-  if (daysPerSec < 0.5) return `${(daysPerSec * 24).toFixed(1)} ч/с`;
+  const hoursPerSec = daysPerSec * 24;
+  if (hoursPerSec < 1 / 30) return `${(hoursPerSec * 3600).toFixed(1)} с/с`;
+  if (hoursPerSec < 0.5) return `${(hoursPerSec * 60).toFixed(1)} мин/с`;
+  if (daysPerSec < 0.5) return `${hoursPerSec.toFixed(1)} ч/с`;
   if (yearsPerSec < 0.5) return `${daysPerSec.toFixed(1)} дн/с`;
   if (yearsPerSec < 1000) return `${yearsPerSec.toFixed(yearsPerSec < 10 ? 1 : 0)} лет/с`;
   if (yearsPerSec < 1e6) return `${formatInt(yearsPerSec / 1000)} тыс. лет/с`;

@@ -30,15 +30,6 @@ body {
 .clock-host {
   position: relative;
   height: 100vh;
-}
-
-@media (max-width: 760px) {
-  body {
-    overflow: auto;
-  }
-
-  .clock-host {
-    height: auto;
-    min-height: 100vh;
-  }
+  /* dvh учитывает выезжающие панели мобильных браузеров */
+  height: 100dvh;
 }

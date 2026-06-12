@@ -142,7 +142,7 @@ export function mountPulsarClock(container: HTMLElement, initial?: PulsarInfo): 
     selectPulsar,
     destroy(): void {
       alive = false;
-      audio.setMuted(true);
+      audio.dispose();
       container.innerHTML = '';
     },
   };

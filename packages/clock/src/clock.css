@@ -88,6 +88,11 @@
   border-left: 1px solid var(--clock-border);
   backdrop-filter: blur(12px);
   overflow-y: auto;
+  /* Скролл не должен «утекать» наружу (на canvas сцены или в жесты
+     Telegram-мини-аппа) и застревать на границе содержимого */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .clock-root .panel-head {
@@ -217,11 +222,13 @@
 /* ---------- Адаптив ---------- */
 
 @media (max-width: 760px) {
+  /* Колонкой: сцена сверху, панель снизу со своим скроллом. Высота фиксированная —
+     иначе внутри фиксированного оверлея дашборда контент вылезал за экран
+     и прокрутка застревала без возможности дойти до конца. */
   .clock-root {
     grid-template-columns: 1fr;
-    grid-template-rows: 55vh auto;
-    height: auto;
-    min-height: 100%;
+    grid-template-rows: 45% 55%;
+    height: 100%;
   }
 
   .clock-root .clock-panel {

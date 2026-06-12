@@ -25,6 +25,9 @@ const TRAIL_MIN_STEP = 0.003;
 class Trail {
   readonly line: THREE.Line;
   private readonly positions = new Float32Array(TRAIL_CAPACITY * 3);
+  // Длина сегмента от предыдущей точки к точке i (у хвостовой точки не учитывается)
+  private readonly segLens = new Float32Array(TRAIL_CAPACITY);
+  private totalLen = 0;
   private count = 0;
   private head = 0; // индекс следующей записи в кольцевом буфере
   private last: [number, number, number] | null = null;
@@ -39,19 +42,37 @@ class Trail {
   }
 
   push(p: [number, number, number]): void {
+    let d = 0;
     if (this.last) {
-      const d = Math.hypot(p[0] - this.last[0], p[1] - this.last[1], p[2] - this.last[2]);
+      d = Math.hypot(p[0] - this.last[0], p[1] - this.last[1], p[2] - this.last[2]);
       if (d < TRAIL_MIN_STEP) return;
       // Слишком большой скачок за кадр (высокая скорость времени): соединять
       // точки хордой бессмысленно — обрываем след и начинаем заново,
       // иначе орбиты зарастают «паутиной» линий через всю систему.
       const maxSegment = Math.min(5, Math.max(0.08, 0.25 * Math.hypot(...p)));
-      if (d > maxSegment) this.clear();
+      if (d > maxSegment) {
+        this.clear();
+        d = 0;
+      }
     }
     this.last = [...p];
+    if (this.count === TRAIL_CAPACITY) {
+      // Перезаписываем самую старую точку — её сегмент уходит из суммы
+      this.totalLen -= this.segLens[(this.head + 1) % TRAIL_CAPACITY]!;
+    }
+    this.segLens[this.head] = d;
+    this.totalLen += d;
     this.positions.set(p, this.head * 3);
     this.head = (this.head + 1) % TRAIL_CAPACITY;
     this.count = Math.min(this.count + 1, TRAIL_CAPACITY);
+    // След не длиннее ~одного оборота, иначе слегка расходящиеся витки
+    // накладываются друг на друга и орбита зарисовывается сплошной «полосой»
+    const maxLen = 0.92 * 2 * Math.PI * Math.hypot(...p);
+    while (this.count > 2 && this.totalLen > maxLen) {
+      const tail = (this.head - this.count + TRAIL_CAPACITY) % TRAIL_CAPACITY;
+      this.totalLen -= this.segLens[(tail + 1) % TRAIL_CAPACITY]!;
+      this.count--;
+    }
     // Перекладываем кольцевой буфер в непрерывный порядок для отрисовки линией
     const geo = this.line.geometry;
     const attr = geo.getAttribute('position') as THREE.BufferAttribute;
@@ -71,6 +92,7 @@ class Trail {
   clear(): void {
     this.count = 0;
     this.head = 0;
+    this.totalLen = 0;
     this.last = null;
     this.line.geometry.setDrawRange(0, 0);
   }

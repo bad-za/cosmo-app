@@ -349,8 +349,11 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
     }
     if (!paused) {
       const wantYears = timeScale * dtSec;
-      let dtStep = DT_BASE;
-      let steps = Math.ceil(wantYears / dtStep);
+      // Шаг подгоняем так, чтобы steps * dtStep == wantYears точно: иначе на
+      // малых скоростях минимальный шаг DT_BASE становится «полом» и фактическая
+      // скорость перестаёт уменьшаться вслед за слайдером
+      let steps = Math.max(1, Math.ceil(wantYears / DT_BASE));
+      let dtStep = wantYears / steps;
       if (steps > stepsLimit) {
         // Не успеваем базовым шагом — укрупняем шаг до предела, дальше честно не успеваем
         dtStep = Math.min(wantYears / stepsLimit, DT_MAX);

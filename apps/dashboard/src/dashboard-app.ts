@@ -60,9 +60,18 @@ export function mountDashboard(app: HTMLElement): void {
   const simPanel = document.querySelector<HTMLElement>('#sim-panel')!;
   const galaxyPanel = document.querySelector<HTMLElement>('#galaxy-panel')!;
 
+  // Бейдж показывает текущий «радиус обзора» и до какого расстояния крутить
+  // зум, чтобы сменился масштаб — иначе непонятно, сколько ещё отдаляться
   function updateBadge(): void {
-    modeBadge.textContent =
-      mode === 'system' ? 'Система · отдалитесь, чтобы увидеть галактику' : 'Галактика · кликните по пульсару';
+    const dist = space.controls.getDistance();
+    if (mode === 'system') {
+      modeBadge.textContent =
+        dist > TO_GALAXY_DISTANCE * 0.25
+          ? `Система · обзор ${Math.round(dist)} а.е. · ещё дальше (до ${TO_GALAXY_DISTANCE} а.е.) — откроется галактика`
+          : `Система · обзор ${dist < 10 ? dist.toFixed(1) : Math.round(dist)} а.е. · отдалитесь, чтобы увидеть галактику`;
+    } else {
+      modeBadge.textContent = `Галактика · обзор ${Math.round(dist * 50)} св. лет · кликните пульсар или приблизьтесь к Солнцу — вернётесь в систему`;
+    }
   }
 
   function startTransition(to: Mode): void {
@@ -103,6 +112,7 @@ export function mountDashboard(app: HTMLElement): void {
     }
   }
 
+  let badgeAccum = 0;
   space.onFrame((dtSec) => {
     if (transition) {
       transitionFrame(dtSec);
@@ -112,6 +122,12 @@ export function mountDashboard(app: HTMLElement): void {
     const dist = space.controls.getDistance();
     if (mode === 'system' && dist > TO_GALAXY_DISTANCE) startTransition('galaxy');
     else if (mode === 'galaxy' && dist < TO_SYSTEM_DISTANCE) startTransition('system');
+    // Обновляем расстояние в бейдже ~4 раза в секунду
+    badgeAccum += dtSec;
+    if (badgeAccum > 0.25) {
+      badgeAccum = 0;
+      updateBadge();
+    }
   });
 
   updateBadge();
