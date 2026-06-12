@@ -110,8 +110,16 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
   `;
 
   const $ = <T extends HTMLElement>(sel: string): T => panel.querySelector<T>(sel)!;
-  const view = new BodiesView(space.scene);
+  const view = new BodiesView(space.scene, viewport);
   const addHint = viewport.querySelector<HTMLElement>('.add-hint')!;
+
+  // Клик по подписи тела = выбор тела (в мелкие планеты попасть пальцем трудно)
+  view.labelsRoot?.addEventListener('click', (e) => {
+    const label = (e.target as HTMLElement).closest<HTMLElement>('.body-label');
+    if (!label || !active) return;
+    selectedName = label.dataset.name ?? null;
+    renderCard();
+  });
 
   // ---------- Журнал ----------
 
@@ -280,6 +288,7 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
     card.className = 'card';
     card.innerHTML = `
       <h2>${body.name}</h2>
+      ${body.story ? `<p class="story">${body.story}</p>` : ''}
       <dl>
         <div><dt>Масса</dt><dd>${formatMass(body.mass)}</dd></div>
         <div><dt>Скорость</dt><dd>${speedKms.toFixed(2)} км/с</dd></div>
@@ -364,6 +373,7 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
     }
 
     view.sync(bodiesInfo());
+    view.updateLabels(space.camera, space.renderer.domElement);
 
     // Обновляем тексты и детектор ~4 раза в секунду
     uiAccumulator += dtSec;
@@ -389,6 +399,8 @@ export function mountSimulator(space: SpaceScene, viewport: HTMLElement, panel: 
     setActive(on: boolean): void {
       active = on;
       view.root.visible = on;
+      // Кадровый цикл при выключенной сцене не зовёт updateLabels — прячем явно
+      if (view.labelsRoot) view.labelsRoot.style.display = on ? '' : 'none';
       if (!on) setAddMode('off');
     },
   };

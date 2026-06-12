@@ -42,12 +42,66 @@ body {
   top: 1rem;
   left: 1rem;
   z-index: 5;
-  padding: 0.45rem 0.9rem;
+  width: 230px;
+  padding: 0.5rem 0.9rem 0.4rem;
   border: 1px solid rgba(127, 212, 255, 0.25);
-  border-radius: 999px;
+  border-radius: 0.8rem;
   background: rgba(10, 14, 26, 0.8);
   color: #7fd4ff;
   font-size: 0.78rem;
+}
+
+/* Лог-шкала расстояния камеры под текстом бейджа */
+
+.zoom-track {
+  position: relative;
+  height: 3px;
+  margin: 0.55rem 0.2rem 0.2rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(127, 212, 255, 0.55), rgba(127, 212, 255, 0.12));
+}
+
+.zoom-dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #7fd4ff;
+  box-shadow: 0 0 6px rgba(127, 212, 255, 0.9);
+  translate: -50% -50%;
+  transition: left 0.2s linear;
+}
+
+.zoom-mark {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 9px;
+  background: rgba(127, 212, 255, 0.5);
+}
+
+.zoom-ticks {
+  position: relative;
+  height: 1.1em;
+  margin: 0.15rem 0.2rem 0;
+  font-size: 0.62rem;
+  color: #828aa6;
+}
+
+.zoom-tick {
+  position: absolute;
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+/* Крайние подписи не должны вылезать за бейдж */
+.zoom-tick:first-child {
+  translate: 0;
+}
+
+.zoom-tick:last-child {
+  translate: -100% 0;
 }
 
 /* ---------- Панель галактики ---------- */

@@ -26,6 +26,40 @@
   display: block;
 }
 
+/* ---------- Подписи тел ---------- */
+
+.body-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none; /* сцену можно вращать «сквозь» контейнер */
+  z-index: 3;
+}
+
+.body-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* transform задаёт позицию тела; сдвиг — чуть выше и по центру */
+  margin: -1.7em 0 0 0;
+  padding: 0.1em 0.45em;
+  border: none;
+  background: rgba(5, 6, 12, 0.55);
+  border-radius: 0.5em;
+  font-size: 0.72rem;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  pointer-events: auto;
+  translate: -50% 0;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.body-label:hover {
+  opacity: 1;
+}
+
 /* ---------- Панель ---------- */
 
 .panel {

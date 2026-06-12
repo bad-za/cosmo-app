@@ -22,7 +22,11 @@ export function mountDashboard(app: HTMLElement): void {
   app.innerHTML = `
     <main class="layout">
       <section id="viewport" class="viewport">
-        <div id="mode-badge" class="mode-badge"></div>
+        <div id="mode-badge" class="mode-badge">
+          <div class="badge-text"></div>
+          <div class="zoom-track"></div>
+          <div class="zoom-ticks"></div>
+        </div>
       </section>
       <aside class="panel-host">
         <div id="sim-panel" class="panel"></div>
@@ -60,18 +64,61 @@ export function mountDashboard(app: HTMLElement): void {
   const simPanel = document.querySelector<HTMLElement>('#sim-panel')!;
   const galaxyPanel = document.querySelector<HTMLElement>('#galaxy-panel')!;
 
-  // Бейдж показывает текущий «радиус обзора» и до какого расстояния крутить
-  // зум, чтобы сменился масштаб — иначе непонятно, сколько ещё отдаляться
-  function updateBadge(): void {
-    const dist = space.controls.getDistance();
-    if (mode === 'system') {
-      modeBadge.textContent =
-        dist > TO_GALAXY_DISTANCE * 0.25
-          ? `Система · обзор ${Math.round(dist)} а.е. · ещё дальше (до ${TO_GALAXY_DISTANCE} а.е.) — откроется галактика`
-          : `Система · обзор ${dist < 10 ? dist.toFixed(1) : Math.round(dist)} а.е. · отдалитесь, чтобы увидеть галактику`;
-    } else {
-      modeBadge.textContent = `Галактика · обзор ${Math.round(dist * 50)} св. лет · кликните пульсар или приблизьтесь к Солнцу — вернётесь в систему`;
+  // Бейдж: текст + логарифмическая шкала с бегунком — видно, где сейчас
+  // камера и сколько осталось до смены масштаба (текстом это было непонятно)
+  const badgeText = modeBadge.querySelector<HTMLElement>('.badge-text')!;
+  const zoomTrack = modeBadge.querySelector<HTMLElement>('.zoom-track')!;
+  const zoomTicks = modeBadge.querySelector<HTMLElement>('.zoom-ticks')!;
+  let ticksMode: Mode | null = null;
+
+  // Диапазоны шкалы и отметки на ней (расстояние камеры, лог-шкала)
+  const SCALE = {
+    system: {
+      min: 0.5,
+      max: TO_GALAXY_DISTANCE,
+      ticks: [
+        { at: 1, label: 'Земля' },
+        { at: 40, label: 'Плутон' },
+        { at: TO_GALAXY_DISTANCE, label: 'галактика' },
+      ],
+    },
+    galaxy: {
+      min: TO_SYSTEM_DISTANCE,
+      max: 2e4,
+      ticks: [
+        { at: TO_SYSTEM_DISTANCE, label: 'система' },
+        { at: 2e3, label: '100 тыс св. лет' },
+      ],
+    },
+  } as const;
+
+  const fracOf = (dist: number, min: number, max: number): number =>
+    Math.min(1, Math.max(0, (Math.log10(dist) - Math.log10(min)) / (Math.log10(max) - Math.log10(min))));
+
+  function rebuildTicks(): void {
+    const { min, max, ticks } = SCALE[mode];
+    zoomTrack.innerHTML = `<div class="zoom-dot"></div>`;
+    zoomTicks.innerHTML = '';
+    for (const t of ticks) {
+      const frac = fracOf(t.at, min, max) * 100;
+      zoomTrack.insertAdjacentHTML('beforeend', `<i class="zoom-mark" style="left:${frac}%"></i>`);
+      zoomTicks.insertAdjacentHTML(
+        'beforeend',
+        `<span class="zoom-tick" style="left:${frac}%">${t.label}</span>`,
+      );
     }
+    ticksMode = mode;
+  }
+
+  function updateBadge(): void {
+    if (ticksMode !== mode) rebuildTicks();
+    const dist = space.controls.getDistance();
+    const { min, max } = SCALE[mode];
+    zoomTrack.querySelector<HTMLElement>('.zoom-dot')!.style.left = `${fracOf(dist, min, max) * 100}%`;
+    badgeText.textContent =
+      mode === 'system'
+        ? `Система · обзор ${dist < 10 ? dist.toFixed(1) : Math.round(dist)} а.е.`
+        : `Галактика · обзор ${Math.round(dist * 50).toLocaleString('ru-RU')} св. лет · кликните пульсар`;
   }
 
   function startTransition(to: Mode): void {
