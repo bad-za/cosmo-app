@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@space/core": "*"
+    "@space/core": "*",
+    "@space/data": "*",
+    "@space/render": "*"
   }
 }
