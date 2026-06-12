@@ -1,0 +1,76 @@
+{
+  "source": "ATNF psrcat 2.6.0",
+  "fetchedAt": "2026-06-12T13:32:37.473Z",
+  "pulsars": [
+    {
+      "name": "B0329+54",
+      "jname": "J0332+5434",
+      "periodSec": 0.714519699726,
+      "periodDot": 2.048265e-15,
+      "epochMJD": 46473,
+      "raDeg": 53.24754,
+      "decDeg": 54.5787025,
+      "distanceKpc": 1.68
+    },
+    {
+      "name": "J0437-4715",
+      "jname": "J0437-4715",
+      "periodSec": 0.005757451941593399,
+      "periodDot": 5.729235e-20,
+      "epochMJD": 55486,
+      "raDeg": 69.316872576,
+      "decDeg": -47.252783951,
+      "distanceKpc": 0.157
+    },
+    {
+      "name": "B0531+21",
+      "jname": "J0534+2200",
+      "periodSec": 0.0333924123,
+      "periodDot": 4.20972e-13,
+      "epochMJD": 48442.5,
+      "raDeg": 83.6330565,
+      "decDeg": 22.014498,
+      "distanceKpc": 2
+    },
+    {
+      "name": "B0833-45",
+      "jname": "J0835-4510",
+      "periodSec": 0.089328385024,
+      "periodDot": 1.25008e-13,
+      "epochMJD": 51559.319,
+      "raDeg": 128.83588121,
+      "decDeg": -45.17635419,
+      "distanceKpc": 0.28
+    },
+    {
+      "name": "B1257+12",
+      "jname": "J1300+1240",
+      "periodSec": 0.00621853194840048,
+      "periodDot": 1.143341e-19,
+      "epochMJD": 49750,
+      "raDeg": 195.0149029,
+      "decDeg": 12.68235336,
+      "distanceKpc": 0.709
+    },
+    {
+      "name": "B1919+21",
+      "jname": "J1921+2153",
+      "periodSec": 1.3373021601895,
+      "periodDot": 1.348207e-15,
+      "epochMJD": 48999,
+      "raDeg": 290.436729,
+      "decDeg": 21.883958,
+      "distanceKpc": 0.3
+    },
+    {
+      "name": "B1937+21",
+      "jname": "J1939+2134",
+      "periodSec": 0.001557806567041489,
+      "periodDot": 1.0510272e-19,
+      "epochMJD": 55656,
+      "raDeg": 294.91067162,
+      "decDeg": 21.583088706,
+      "distanceKpc": 3.5
+    }
+  ]
+}
